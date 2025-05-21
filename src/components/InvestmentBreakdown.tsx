@@ -38,6 +38,26 @@ const InvestmentBreakdown = ({
     }
   };
 
+  // Calculate total extra profit from pledging
+  const totalExtraProfit = breakdown.reduce((total, yearData) => {
+    if (yearData.months) {
+      return total + yearData.months.reduce((yearTotal, monthData) => {
+        return yearTotal + (monthData.extraProfit || 0);
+      }, 0);
+    }
+    return total;
+  }, 0);
+
+  // Calculate total regular interest (excluding extra profit)
+  const totalRegularInterest = breakdown.reduce((total, yearData) => {
+    if (yearData.months) {
+      return total + yearData.months.reduce((yearTotal, monthData) => {
+        return yearTotal + (monthData.interest || 0);
+      }, 0);
+    }
+    return total;
+  }, 0);
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -47,7 +67,7 @@ const InvestmentBreakdown = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="bg-finance-primary text-white">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Final Amount</CardTitle>
@@ -66,10 +86,18 @@ const InvestmentBreakdown = ({
           </Card>
           <Card className="bg-finance-growth text-white">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Total Interest</CardTitle>
+              <CardTitle className="text-lg">Regular Interest</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{formatCurrency(totalInterest)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(totalRegularInterest)}</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-finance-accent text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Extra Profit</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{formatCurrency(totalExtraProfit)}</p>
             </CardContent>
           </Card>
         </div>
@@ -177,7 +205,9 @@ const InvestmentBreakdown = ({
                     <TableHead>Period</TableHead>
                     <TableHead>Starting Balance</TableHead>
                     <TableHead>Contribution</TableHead>
-                    <TableHead>Interest Earned</TableHead>
+                    <TableHead>Regular Interest</TableHead>
+                    <TableHead>Pledged Amount</TableHead>
+                    <TableHead>Extra Profit</TableHead>
                     <TableHead>End Balance</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -198,7 +228,9 @@ const InvestmentBreakdown = ({
                         <TableCell className="font-medium">Year {yearData.year}</TableCell>
                         <TableCell>{formatCurrency(yearData.startBalance)}</TableCell>
                         <TableCell>{formatCurrency(yearData.contributions)}</TableCell>
-                        <TableCell>{formatCurrency(yearData.interest)}</TableCell>
+                        <TableCell colSpan={3}>
+                          {formatCurrency(yearData.interest)}
+                        </TableCell>
                         <TableCell className="font-medium">{formatCurrency(yearData.endBalance)}</TableCell>
                       </TableRow>
                       {expandedYears.includes(yearData.year) && yearData.months?.map((monthData) => (
@@ -208,6 +240,8 @@ const InvestmentBreakdown = ({
                           <TableCell>{formatCurrency(monthData.startBalance)}</TableCell>
                           <TableCell>{formatCurrency(monthData.contribution)}</TableCell>
                           <TableCell>{formatCurrency(monthData.interest)}</TableCell>
+                          <TableCell>{formatCurrency(monthData.pledgeAmount || 0)}</TableCell>
+                          <TableCell>{formatCurrency(monthData.extraProfit || 0)}</TableCell>
                           <TableCell>{formatCurrency(monthData.endBalance)}</TableCell>
                         </TableRow>
                       ))}

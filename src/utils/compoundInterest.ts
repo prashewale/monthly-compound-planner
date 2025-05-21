@@ -4,6 +4,8 @@ export interface InvestmentData {
   monthlyContribution: number;
   annualInterestRate: number;
   years: number;
+  pledgeHaircut: number; // Percentage haircut when pledging balance
+  extraProfitRate: number; // Additional annual profit percentage from pledging
 }
 
 export interface YearlyBreakdown {
@@ -20,13 +22,23 @@ export interface MonthlyBreakdown {
   startBalance: number;
   contribution: number;
   interest: number;
+  pledgeAmount: number; // Amount pledged after haircut
+  extraProfit: number; // Extra profit from pledging
   endBalance: number;
 }
 
 export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown[] => {
-  const { initialInvestment, monthlyContribution, annualInterestRate, years } = data;
+  const { 
+    initialInvestment, 
+    monthlyContribution, 
+    annualInterestRate, 
+    years,
+    pledgeHaircut,
+    extraProfitRate 
+  } = data;
   
   const monthlyRate = annualInterestRate / 100 / 12;
+  const monthlyExtraProfitRate = extraProfitRate / 100 / 12;
   let currentBalance = initialInvestment;
   const breakdown: YearlyBreakdown[] = [];
   
@@ -34,6 +46,7 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     const startBalance = currentBalance;
     const yearlyContribution = monthlyContribution * 12;
     let yearlyInterest = 0;
+    let yearlyExtraProfit = 0;
     const monthlyData: MonthlyBreakdown[] = [];
     
     // Calculate month by month for more accurate compounding
@@ -43,12 +56,21 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       // Add this month's contribution
       currentBalance += monthlyContribution;
       
-      // Calculate interest for this month
-      const monthlyInterest = currentBalance * monthlyRate;
-      yearlyInterest += monthlyInterest;
+      // Calculate pledging amount (after haircut)
+      const pledgeableBalance = currentBalance;
+      const pledgeAmount = pledgeableBalance * (1 - pledgeHaircut/100);
       
-      // Add the interest to the balance
-      currentBalance += monthlyInterest;
+      // Calculate regular interest for this month
+      const monthlyInterest = currentBalance * monthlyRate;
+      
+      // Calculate extra profit from pledging
+      const extraProfit = pledgeAmount * monthlyExtraProfitRate;
+      
+      yearlyInterest += monthlyInterest;
+      yearlyExtraProfit += extraProfit;
+      
+      // Add the interest and extra profit to the balance
+      currentBalance += monthlyInterest + extraProfit;
       
       // Record monthly breakdown
       monthlyData.push({
@@ -56,6 +78,8 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
         startBalance: monthStartBalance,
         contribution: monthlyContribution,
         interest: monthlyInterest,
+        pledgeAmount: pledgeAmount,
+        extraProfit: extraProfit,
         endBalance: currentBalance,
       });
     }
@@ -64,7 +88,7 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       year,
       startBalance,
       contributions: yearlyContribution,
-      interest: yearlyInterest,
+      interest: yearlyInterest + yearlyExtraProfit,
       endBalance: currentBalance,
       months: monthlyData,
     });

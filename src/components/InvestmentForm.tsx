@@ -17,6 +17,8 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
     monthlyContribution: 500,
     annualInterestRate: 7,
     years: 20,
+    pledgeHaircut: 10, // Default 10% haircut
+    extraProfitRate: 3, // Default 3% extra profit
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,6 +132,58 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>
               <span>15%</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="pledgeHaircut">Pledge Haircut (%)</Label>
+            <Input
+              id="pledgeHaircut"
+              name="pledgeHaircut"
+              type="number"
+              min="0"
+              max="50"
+              step="1"
+              value={formData.pledgeHaircut}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="pledgeHaircut-slider"
+              min={0}
+              max={30}
+              step={1}
+              value={[formData.pledgeHaircut]}
+              onValueChange={(value) => handleSliderChange("pledgeHaircut", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0%</span>
+              <span>30%</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="extraProfitRate">Extra Annual Profit Rate (%)</Label>
+            <Input
+              id="extraProfitRate"
+              name="extraProfitRate"
+              type="number"
+              min="0"
+              max="20"
+              step="0.1"
+              value={formData.extraProfitRate}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="extraProfitRate-slider"
+              min={0}
+              max={10}
+              step={0.1}
+              value={[formData.extraProfitRate]}
+              onValueChange={(value) => handleSliderChange("extraProfitRate", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0%</span>
+              <span>10%</span>
             </div>
           </div>
 
