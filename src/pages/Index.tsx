@@ -1,12 +1,69 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import InvestmentForm from "@/components/InvestmentForm";
+import InvestmentBreakdown from "@/components/InvestmentBreakdown";
+import { InvestmentData, YearlyBreakdown, calculateCompoundInterest } from "@/utils/compoundInterest";
+import { DollarSign } from "lucide-react";
 
 const Index = () => {
+  const [breakdown, setBreakdown] = useState<YearlyBreakdown[]>([]);
+  const [investmentData, setInvestmentData] = useState<InvestmentData | null>(null);
+
+  const handleCalculate = (data: InvestmentData) => {
+    const results = calculateCompoundInterest(data);
+    setBreakdown(results);
+    setInvestmentData(data);
+  };
+
+  const totalContributions = investmentData ? investmentData.monthlyContribution * 12 * investmentData.years : 0;
+  const initialInvestment = investmentData ? investmentData.initialInvestment : 0;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-finance-background">
+      <header className="bg-finance-primary text-white py-6">
+        <div className="container">
+          <div className="flex items-center justify-center md:justify-start gap-3">
+            <DollarSign className="h-8 w-8" />
+            <h1 className="text-2xl md:text-3xl font-bold">Investment Planner</h1>
+          </div>
+          <p className="text-center md:text-left mt-2 text-finance-accent">
+            Calculate the growth of your investments over time with compound interest
+          </p>
+        </div>
+      </header>
+      
+      <main className="container py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-4">
+            <InvestmentForm onCalculate={handleCalculate} />
+          </div>
+          <div className="lg:col-span-8">
+            {breakdown.length > 0 ? (
+              <InvestmentBreakdown 
+                breakdown={breakdown} 
+                initialInvestment={initialInvestment}
+                totalContributions={totalContributions}
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center p-8 bg-white rounded-lg border border-gray-200">
+                <div className="text-center">
+                  <DollarSign className="h-16 w-16 text-finance-primary mx-auto mb-4" />
+                  <h2 className="text-xl font-medium text-gray-900 mb-2">Welcome to Your Investment Planner</h2>
+                  <p className="text-gray-500 max-w-md">
+                    Fill out the form with your investment details and see how your money can grow over time with the power of compound interest.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <footer className="bg-finance-primary text-white py-4 mt-12">
+        <div className="container text-center text-sm">
+          <p>Investment Planner © {new Date().getFullYear()} | This calculator is for educational purposes only.</p>
+        </div>
+      </footer>
     </div>
   );
 };
