@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { YearlyBreakdown, formatCurrency, formatMonth } from "@/utils/compoundInterest";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, IndianRupee } from "lucide-react";
 
 interface InvestmentBreakdownProps {
   breakdown: YearlyBreakdown[];
@@ -21,6 +21,11 @@ const InvestmentBreakdown = ({
   const finalAmount = breakdown.length > 0 ? breakdown[breakdown.length - 1].endBalance : 0;
   const totalInterest = finalAmount - initialInvestment - totalContributions;
   const [expandedYears, setExpandedYears] = useState<number[]>([]);
+
+  // Calculate total yearly bonus
+  const totalYearlyBonus = breakdown.reduce((total, yearData) => {
+    return total + (yearData.yearlyBonus || 0);
+  }, 0);
 
   // Prepare data for chart
   const chartData = breakdown.map((item) => ({
@@ -67,7 +72,7 @@ const InvestmentBreakdown = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           <Card className="bg-finance-primary text-white">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Final Amount</CardTitle>
@@ -100,6 +105,14 @@ const InvestmentBreakdown = ({
               <p className="text-2xl font-bold">{formatCurrency(totalExtraProfit)}</p>
             </CardContent>
           </Card>
+          <Card className="bg-yellow-600 text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Yearly Bonus</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{formatCurrency(totalYearlyBonus)}</p>
+            </CardContent>
+          </Card>
         </div>
 
         <Tabs defaultValue="chart" className="w-full">
@@ -130,15 +143,15 @@ const InvestmentBreakdown = ({
                     }}
                   />
                   <YAxis 
-                    tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
                     label={{ 
-                      value: 'Balance ($)', 
+                      value: 'Balance (₹)', 
                       angle: -90, 
                       position: 'insideLeft' 
                     }}
                   />
                   <Tooltip 
-                    formatter={(value) => [`$${Number(value).toLocaleString()}`, undefined]}
+                    formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, undefined]}
                     labelFormatter={(label) => `Year ${label}`}
                   />
                   <Legend />
@@ -177,6 +190,7 @@ const InvestmentBreakdown = ({
                     <TableHead>Starting Balance</TableHead>
                     <TableHead>Annual Contribution</TableHead>
                     <TableHead>Interest Earned</TableHead>
+                    <TableHead>Yearly Bonus</TableHead>
                     <TableHead>End Balance</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -187,6 +201,7 @@ const InvestmentBreakdown = ({
                       <TableCell>{formatCurrency(row.startBalance)}</TableCell>
                       <TableCell>{formatCurrency(row.contributions)}</TableCell>
                       <TableCell>{formatCurrency(row.interest)}</TableCell>
+                      <TableCell>{formatCurrency(row.yearlyBonus || 0)}</TableCell>
                       <TableCell className="font-medium">
                         {formatCurrency(row.endBalance)}
                       </TableCell>
@@ -230,6 +245,11 @@ const InvestmentBreakdown = ({
                         <TableCell>{formatCurrency(yearData.contributions)}</TableCell>
                         <TableCell colSpan={3}>
                           {formatCurrency(yearData.interest)}
+                          {yearData.yearlyBonus > 0 && (
+                            <div className="text-xs text-yellow-600 font-medium mt-1">
+                              +{formatCurrency(yearData.yearlyBonus)} bonus
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell className="font-medium">{formatCurrency(yearData.endBalance)}</TableCell>
                       </TableRow>

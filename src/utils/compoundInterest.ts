@@ -6,6 +6,7 @@ export interface InvestmentData {
   years: number;
   pledgeHaircut: number; // Percentage haircut when pledging balance
   extraProfitRate: number; // Additional annual profit percentage from pledging
+  yearlyBonusRate: number; // Yearly bonus rate for monthly contributions
 }
 
 export interface YearlyBreakdown {
@@ -13,6 +14,7 @@ export interface YearlyBreakdown {
   startBalance: number;
   contributions: number;
   interest: number;
+  yearlyBonus: number; // Yearly bonus on monthly contributions
   endBalance: number;
   months?: MonthlyBreakdown[];
 }
@@ -34,7 +36,8 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     annualInterestRate, 
     years,
     pledgeHaircut,
-    extraProfitRate 
+    extraProfitRate,
+    yearlyBonusRate
   } = data;
   
   const monthlyRate = annualInterestRate / 100 / 12;
@@ -84,11 +87,16 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       });
     }
     
+    // Calculate yearly bonus on monthly contributions
+    const yearlyBonus = yearlyContribution * (yearlyBonusRate / 100);
+    currentBalance += yearlyBonus;
+    
     breakdown.push({
       year,
       startBalance,
       contributions: yearlyContribution,
       interest: yearlyInterest + yearlyExtraProfit,
+      yearlyBonus: yearlyBonus,
       endBalance: currentBalance,
       months: monthlyData,
     });
@@ -98,12 +106,14 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
 };
 
 export const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat('en-US', {
+  // Format according to Indian numeration system (with rupee symbol)
+  const formatter = new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value);
+  });
+  return formatter.format(value);
 };
 
 export const formatMonth = (month: number): string => {

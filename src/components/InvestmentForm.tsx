@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { InvestmentData } from "@/utils/compoundInterest";
+import { IndianRupee } from "lucide-react";
 
 interface InvestmentFormProps {
   onCalculate: (data: InvestmentData) => void;
@@ -19,6 +20,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
     years: 20,
     pledgeHaircut: 10, // Default 10% haircut
     extraProfitRate: 3, // Default 3% extra profit
+    yearlyBonusRate: 2, // Default 2% yearly bonus on contributions
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +56,9 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
           <div className="space-y-2">
             <Label htmlFor="initialInvestment">Initial Investment</Label>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">$</span>
+              <span className="text-sm text-muted-foreground">
+                <IndianRupee className="h-4 w-4" />
+              </span>
               <Input
                 id="initialInvestment"
                 name="initialInvestment"
@@ -75,15 +79,17 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               onValueChange={(value) => handleSliderChange("initialInvestment", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>$0</span>
-              <span>$100,000</span>
+              <span><IndianRupee className="inline h-3 w-3" /> 0</span>
+              <span><IndianRupee className="inline h-3 w-3" /> 1,00,000</span>
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="monthlyContribution">Monthly Contribution</Label>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">$</span>
+              <span className="text-sm text-muted-foreground">
+                <IndianRupee className="h-4 w-4" />
+              </span>
               <Input
                 id="monthlyContribution"
                 name="monthlyContribution"
@@ -104,8 +110,8 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               onValueChange={(value) => handleSliderChange("monthlyContribution", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>$0</span>
-              <span>$5,000</span>
+              <span><IndianRupee className="inline h-3 w-3" /> 0</span>
+              <span><IndianRupee className="inline h-3 w-3" /> 5,000</span>
             </div>
           </div>
 
@@ -180,6 +186,32 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               step={0.1}
               value={[formData.extraProfitRate]}
               onValueChange={(value) => handleSliderChange("extraProfitRate", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0%</span>
+              <span>10%</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="yearlyBonusRate">Yearly Bonus on Contributions (%)</Label>
+            <Input
+              id="yearlyBonusRate"
+              name="yearlyBonusRate"
+              type="number"
+              min="0"
+              max="20"
+              step="0.1"
+              value={formData.yearlyBonusRate}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="yearlyBonusRate-slider"
+              min={0}
+              max={10}
+              step={0.1}
+              value={[formData.yearlyBonusRate]}
+              onValueChange={(value) => handleSliderChange("yearlyBonusRate", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>

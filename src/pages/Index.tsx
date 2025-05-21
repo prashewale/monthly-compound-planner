@@ -3,7 +3,7 @@ import { useState } from "react";
 import InvestmentForm from "@/components/InvestmentForm";
 import InvestmentBreakdown from "@/components/InvestmentBreakdown";
 import { InvestmentData, YearlyBreakdown, calculateCompoundInterest } from "@/utils/compoundInterest";
-import { DollarSign } from "lucide-react";
+import { IndianRupee } from "lucide-react";
 
 const Index = () => {
   const [breakdown, setBreakdown] = useState<YearlyBreakdown[]>([]);
@@ -23,7 +23,7 @@ const Index = () => {
       <header className="bg-finance-primary text-white py-6">
         <div className="container">
           <div className="flex items-center justify-center md:justify-start gap-3">
-            <DollarSign className="h-8 w-8" />
+            <IndianRupee className="h-8 w-8" />
             <h1 className="text-2xl md:text-3xl font-bold">Investment Planner</h1>
           </div>
           <p className="text-center md:text-left mt-2 text-finance-accent">
@@ -47,7 +47,7 @@ const Index = () => {
             ) : (
               <div className="h-full flex items-center justify-center p-8 bg-white rounded-lg border border-gray-200">
                 <div className="text-center">
-                  <DollarSign className="h-16 w-16 text-finance-primary mx-auto mb-4" />
+                  <IndianRupee className="h-16 w-16 text-finance-primary mx-auto mb-4" />
                   <h2 className="text-xl font-medium text-gray-900 mb-2">Welcome to Your Investment Planner</h2>
                   <p className="text-gray-500 max-w-md">
                     Fill out the form with your investment details and see how your money can grow over time with the power of compound interest.
