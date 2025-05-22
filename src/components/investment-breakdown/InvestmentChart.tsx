@@ -14,12 +14,20 @@ const InvestmentChart = ({
   totalContributions,
 }: InvestmentChartProps) => {
   // Prepare data for chart
-  const chartData = breakdown.map((item) => ({
-    year: item.year,
-    balance: item.endBalance,
-    contributions: initialInvestment + item.year * 12 * (totalContributions / (breakdown.length * 12)),
-    interest: item.endBalance - initialInvestment - item.year * 12 * (totalContributions / (breakdown.length * 12)),
-  }));
+  const chartData = breakdown.map((item) => {
+    // Calculate cumulative contributions up to this year
+    const cumulativeContributions = initialInvestment + 
+      breakdown
+        .filter(y => y.year <= item.year)
+        .reduce((total, y) => total + y.contributions, 0);
+    
+    return {
+      year: item.year,
+      balance: item.endBalance,
+      contributions: cumulativeContributions,
+      interest: item.endBalance - cumulativeContributions,
+    };
+  });
 
   return (
     <div className="h-[400px] w-full">

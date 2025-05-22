@@ -14,6 +14,7 @@ const YearlyBreakdownTable = ({ breakdown }: YearlyBreakdownTableProps) => {
           <TableRow>
             <TableHead>Year</TableHead>
             <TableHead>Starting Balance</TableHead>
+            <TableHead>Monthly Contribution</TableHead>
             <TableHead>Annual Contribution</TableHead>
             <TableHead>Interest Earned</TableHead>
             <TableHead>Yearly Bonus</TableHead>
@@ -25,6 +26,7 @@ const YearlyBreakdownTable = ({ breakdown }: YearlyBreakdownTableProps) => {
             <TableRow key={row.year}>
               <TableCell>{row.year}</TableCell>
               <TableCell>{formatCurrency(row.startBalance)}</TableCell>
+              <TableCell>{formatCurrency(row.monthlyContribution || 0)}</TableCell>
               <TableCell>{formatCurrency(row.contributions)}</TableCell>
               <TableCell>{formatCurrency(row.interest)}</TableCell>
               <TableCell>{formatCurrency(row.yearlyBonus || 0)}</TableCell>

@@ -21,6 +21,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
     pledgeHaircut: 10, // Default 10% haircut
     extraProfitRate: 3, // Default 3% extra profit
     yearlyBonusRate: 2, // Default 2% yearly bonus on contributions
+    yearlyContributionIncreaseRate: 0, // Default 0% yearly increase in contributions
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,6 +113,32 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <div className="flex justify-between text-xs text-muted-foreground">
               <span><IndianRupee className="inline h-3 w-3" /> 0</span>
               <span><IndianRupee className="inline h-3 w-3" /> 50,000</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="yearlyContributionIncreaseRate">Yearly Contribution Increase (%)</Label>
+            <Input
+              id="yearlyContributionIncreaseRate"
+              name="yearlyContributionIncreaseRate"
+              type="number"
+              min="0"
+              max="50"
+              step="0.1"
+              value={formData.yearlyContributionIncreaseRate}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="yearlyContributionIncreaseRate-slider"
+              min={0}
+              max={25}
+              step={0.1}
+              value={[formData.yearlyContributionIncreaseRate]}
+              onValueChange={(value) => handleSliderChange("yearlyContributionIncreaseRate", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0%</span>
+              <span>25%</span>
             </div>
           </div>
 

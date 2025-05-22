@@ -15,7 +15,8 @@ const Index = () => {
     setInvestmentData(data);
   };
 
-  const totalContributions = investmentData ? investmentData.monthlyContribution * 12 * investmentData.years : 0;
+  // Calculate total contributions from the breakdown data for accuracy
+  const totalContributions = breakdown.reduce((total, year) => total + year.contributions, 0);
   const initialInvestment = investmentData ? investmentData.initialInvestment : 0;
 
   return (
