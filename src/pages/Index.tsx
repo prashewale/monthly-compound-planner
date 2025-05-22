@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import InvestmentForm from "@/components/InvestmentForm";
-import InvestmentBreakdown from "@/components/InvestmentBreakdown";
+import InvestmentBreakdown from "@/components/investment-breakdown";
 import { InvestmentData, YearlyBreakdown, calculateCompoundInterest } from "@/utils/compoundInterest";
 import { IndianRupee } from "lucide-react";
 
