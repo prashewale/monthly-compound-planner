@@ -73,14 +73,14 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <Slider
               id="initialInvestment-slider"
               min={0}
-              max={100000}
+              max={500000}
               step={1000}
               value={[formData.initialInvestment]}
               onValueChange={(value) => handleSliderChange("initialInvestment", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span><IndianRupee className="inline h-3 w-3" /> 0</span>
-              <span><IndianRupee className="inline h-3 w-3" /> 1,00,000</span>
+              <span><IndianRupee className="inline h-3 w-3" /> 5,00,000</span>
             </div>
           </div>
 
@@ -104,14 +104,14 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <Slider
               id="monthlyContribution-slider"
               min={0}
-              max={5000}
-              step={50}
+              max={50000}
+              step={100}
               value={[formData.monthlyContribution]}
               onValueChange={(value) => handleSliderChange("monthlyContribution", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span><IndianRupee className="inline h-3 w-3" /> 0</span>
-              <span><IndianRupee className="inline h-3 w-3" /> 5,000</span>
+              <span><IndianRupee className="inline h-3 w-3" /> 50,000</span>
             </div>
           </div>
 
@@ -122,7 +122,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               name="annualInterestRate"
               type="number"
               min="0"
-              max="30"
+              max="50"
               step="0.1"
               value={formData.annualInterestRate}
               onChange={handleInputChange}
@@ -130,14 +130,14 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <Slider
               id="annualInterestRate-slider"
               min={0}
-              max={15}
+              max={30}
               step={0.1}
               value={[formData.annualInterestRate]}
               onValueChange={(value) => handleSliderChange("annualInterestRate", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>
-              <span>15%</span>
+              <span>30%</span>
             </div>
           </div>
 
@@ -148,7 +148,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               name="pledgeHaircut"
               type="number"
               min="0"
-              max="50"
+              max="75"
               step="1"
               value={formData.pledgeHaircut}
               onChange={handleInputChange}
@@ -156,14 +156,14 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <Slider
               id="pledgeHaircut-slider"
               min={0}
-              max={30}
+              max={50}
               step={1}
               value={[formData.pledgeHaircut]}
               onValueChange={(value) => handleSliderChange("pledgeHaircut", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>
-              <span>30%</span>
+              <span>50%</span>
             </div>
           </div>
 
@@ -174,7 +174,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               name="extraProfitRate"
               type="number"
               min="0"
-              max="20"
+              max="50"
               step="0.1"
               value={formData.extraProfitRate}
               onChange={handleInputChange}
@@ -182,14 +182,14 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <Slider
               id="extraProfitRate-slider"
               min={0}
-              max={10}
+              max={20}
               step={0.1}
               value={[formData.extraProfitRate]}
               onValueChange={(value) => handleSliderChange("extraProfitRate", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>
-              <span>10%</span>
+              <span>20%</span>
             </div>
           </div>
 
@@ -200,7 +200,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               name="yearlyBonusRate"
               type="number"
               min="0"
-              max="20"
+              max="50"
               step="0.1"
               value={formData.yearlyBonusRate}
               onChange={handleInputChange}
@@ -208,14 +208,14 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <Slider
               id="yearlyBonusRate-slider"
               min={0}
-              max={10}
+              max={20}
               step={0.1}
               value={[formData.yearlyBonusRate]}
               onValueChange={(value) => handleSliderChange("yearlyBonusRate", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>
-              <span>10%</span>
+              <span>20%</span>
             </div>
           </div>
 
@@ -226,7 +226,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               name="years"
               type="number"
               min="1"
-              max="50"
+              max="100"
               step="1"
               value={formData.years}
               onChange={handleInputChange}
@@ -234,14 +234,14 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <Slider
               id="years-slider"
               min={1}
-              max={40}
+              max={60}
               step={1}
               value={[formData.years]}
               onValueChange={(value) => handleSliderChange("years", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>1 year</span>
-              <span>40 years</span>
+              <span>60 years</span>
             </div>
           </div>
 
