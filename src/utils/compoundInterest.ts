@@ -1,4 +1,3 @@
-
 export interface InvestmentData {
   initialInvestment: number;
   monthlyContribution: number;
@@ -64,6 +63,22 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     let totalYearlyBonus = 0;
     const monthlyData: MonthlyBreakdown[] = [];
     
+    // Calculate total bonus from previous years to distribute monthly
+    let totalBonusFromPreviousYears = 0;
+    if (year > 1) {
+      for (let bonusYear = 1; bonusYear < year; bonusYear++) {
+        for (let month = 1; month <= 12; month++) {
+          const contributionKey = `${bonusYear}-${month}`;
+          const contributionAmount = allContributions[contributionKey] || 0;
+          const bonusAmount = contributionAmount * (yearlyBonusRate / 100);
+          totalBonusFromPreviousYears += bonusAmount;
+        }
+      }
+    }
+    
+    // Distribute previous years bonus across 12 months
+    const monthlyBonusFromPreviousYears = totalBonusFromPreviousYears / 12;
+    
     // Calculate month by month for more accurate compounding
     for (let month = 1; month <= 12; month++) {
       const monthStartBalance = currentBalance;
@@ -91,10 +106,14 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       // Add the interest and extra profit to the balance
       currentBalance += monthlyInterest + extraProfit;
       
-      // Calculate bonus for this specific month's contribution only
+      // Calculate bonus for this specific month's contribution
       const monthlyBonusForThisContribution = currentMonthlyContribution * (yearlyBonusRate / 100);
-      currentBalance += monthlyBonusForThisContribution;
-      totalYearlyBonus += monthlyBonusForThisContribution;
+      
+      // Total monthly bonus = current month's contribution bonus + portion of previous years' bonus
+      const totalMonthlyBonus = monthlyBonusForThisContribution + monthlyBonusFromPreviousYears;
+      
+      currentBalance += totalMonthlyBonus;
+      totalYearlyBonus += totalMonthlyBonus;
       
       // Record monthly breakdown
       monthlyData.push({
@@ -106,31 +125,8 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
         extraProfit: extraProfit,
         endBalance: currentBalance,
         contributionWithBonus: currentMonthlyContribution,
-        monthlyBonus: monthlyBonusForThisContribution
+        monthlyBonus: totalMonthlyBonus
       });
-    }
-    
-    // Apply yearly bonus to ALL previous years' contributions (excluding current year which is already added above)
-    let bonusFromPreviousYears = 0;
-    
-    // Loop through all previous years (excluding current year)
-    for (let bonusYear = 1; bonusYear < year; bonusYear++) {
-      for (let month = 1; month <= 12; month++) {
-        const contributionKey = `${bonusYear}-${month}`;
-        const contributionAmount = allContributions[contributionKey] || 0;
-        const bonusAmount = contributionAmount * (yearlyBonusRate / 100);
-        bonusFromPreviousYears += bonusAmount;
-        
-        // Add bonus to current balance
-        currentBalance += bonusAmount;
-      }
-    }
-    
-    totalYearlyBonus += bonusFromPreviousYears;
-    
-    // Update the end balance in monthly data for the last month to reflect the bonus from previous years
-    if (monthlyData.length > 0) {
-      monthlyData[monthlyData.length - 1].endBalance = currentBalance;
     }
     
     breakdown.push({
