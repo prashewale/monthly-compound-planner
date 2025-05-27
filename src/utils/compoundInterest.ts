@@ -1,3 +1,4 @@
+
 export interface InvestmentData {
   initialInvestment: number;
   monthlyContribution: number;
@@ -48,8 +49,8 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
   let currentBalance = initialInvestment;
   const breakdown: YearlyBreakdown[] = [];
   
-  // Track monthly contributions for applying yearly bonus
-  const contributionsTracker: {[key: string]: number} = {};
+  // Track all monthly contributions across all years for cumulative bonus calculation
+  const allContributions: {[key: string]: number} = {};
   
   // Track current monthly contribution amount
   let currentMonthlyContribution = monthlyContribution;
@@ -68,9 +69,9 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       // Add this month's contribution
       currentBalance += currentMonthlyContribution;
       
-      // Track this contribution for yearly bonus
+      // Track this contribution for yearly bonus (store with year-month key)
       const contributionKey = `${year}-${month}`;
-      contributionsTracker[contributionKey] = currentMonthlyContribution;
+      allContributions[contributionKey] = currentMonthlyContribution;
       
       // Calculate pledging amount (after haircut)
       const pledgeableBalance = currentBalance;
@@ -101,21 +102,25 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       });
     }
     
-    // Apply yearly bonus to each monthly contribution for this year
+    // Apply yearly bonus to ALL previous contributions (including current year)
     let totalYearlyBonus = 0;
-    for (let month = 1; month <= 12; month++) {
-      const contributionKey = `${year}-${month}`;
-      const contributionAmount = contributionsTracker[contributionKey] || 0;
-      const bonusAmount = contributionAmount * (yearlyBonusRate / 100);
-      totalYearlyBonus += bonusAmount;
-      
-      // Update the end balance
-      currentBalance += bonusAmount;
-      
-      // Update the monthly data to reflect the bonus
-      if (monthlyData[month - 1]) {
-        monthlyData[month - 1].endBalance += bonusAmount;
+    
+    // Loop through all years up to and including current year
+    for (let bonusYear = 1; bonusYear <= year; bonusYear++) {
+      for (let month = 1; month <= 12; month++) {
+        const contributionKey = `${bonusYear}-${month}`;
+        const contributionAmount = allContributions[contributionKey] || 0;
+        const bonusAmount = contributionAmount * (yearlyBonusRate / 100);
+        totalYearlyBonus += bonusAmount;
+        
+        // Add bonus to current balance
+        currentBalance += bonusAmount;
       }
+    }
+    
+    // Update the end balance in monthly data for the last month to reflect the total bonus
+    if (monthlyData.length > 0) {
+      monthlyData[monthlyData.length - 1].endBalance = currentBalance;
     }
     
     breakdown.push({
