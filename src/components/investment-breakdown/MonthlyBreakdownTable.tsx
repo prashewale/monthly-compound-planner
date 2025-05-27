@@ -36,30 +36,30 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {breakdown.map((yearData) => (
-            <>
-              <TableRow 
-                key={`year-${yearData.year}`} 
-                className="bg-muted/30 cursor-pointer hover:bg-muted"
-                onClick={() => toggleYearExpansion(yearData.year)}
-              >
-                <TableCell>
-                  {expandedYears.includes(yearData.year) ? 
-                    <ChevronDown className="h-4 w-4" /> : 
-                    <ChevronRight className="h-4 w-4" />
-                  }
-                </TableCell>
-                <TableCell className="font-medium">Year {yearData.year}</TableCell>
-                <TableCell>{formatCurrency(yearData.startBalance)}</TableCell>
-                <TableCell>{formatCurrency(yearData.contributions)}</TableCell>
-                <TableCell>{formatCurrency(yearData.interest)}</TableCell>
-                <TableCell colSpan={2}>-</TableCell>
-                <TableCell className="font-medium text-yellow-600">
-                  {formatCurrency(yearData.yearlyBonus)}
-                </TableCell>
-                <TableCell className="font-medium">{formatCurrency(yearData.endBalance)}</TableCell>
-              </TableRow>
-              {expandedYears.includes(yearData.year) && yearData.months?.map((monthData) => (
+          {breakdown.map((yearData) => [
+            <TableRow 
+              key={`year-${yearData.year}`} 
+              className="bg-muted/30 cursor-pointer hover:bg-muted"
+              onClick={() => toggleYearExpansion(yearData.year)}
+            >
+              <TableCell>
+                {expandedYears.includes(yearData.year) ? 
+                  <ChevronDown className="h-4 w-4" /> : 
+                  <ChevronRight className="h-4 w-4" />
+                }
+              </TableCell>
+              <TableCell className="font-medium">Year {yearData.year}</TableCell>
+              <TableCell>{formatCurrency(yearData.startBalance)}</TableCell>
+              <TableCell>{formatCurrency(yearData.contributions)}</TableCell>
+              <TableCell>{formatCurrency(yearData.interest)}</TableCell>
+              <TableCell colSpan={2}>-</TableCell>
+              <TableCell className="font-medium text-yellow-600">
+                {formatCurrency(yearData.yearlyBonus)}
+              </TableCell>
+              <TableCell className="font-medium">{formatCurrency(yearData.endBalance)}</TableCell>
+            </TableRow>,
+            ...(expandedYears.includes(yearData.year) && yearData.months ? 
+              yearData.months.map((monthData) => (
                 <TableRow key={`year-${yearData.year}-month-${monthData.month}`} className="bg-muted/10">
                   <TableCell></TableCell>
                   <TableCell className="pl-8">{formatMonth(monthData.month)}</TableCell>
@@ -73,9 +73,8 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
                   </TableCell>
                   <TableCell>{formatCurrency(monthData.endBalance)}</TableCell>
                 </TableRow>
-              ))}
-            </>
-          ))}
+              )) : [])
+          ]).flat()}
         </TableBody>
       </Table>
     </div>

@@ -1,3 +1,4 @@
+
 export interface InvestmentData {
   initialInvestment: number;
   monthlyContribution: number;
@@ -29,7 +30,7 @@ export interface MonthlyBreakdown {
   extraProfit: number; // Extra profit from pledging
   endBalance: number;
   contributionWithBonus?: number; // Track the contribution amount that will receive bonus
-  monthlyBonus?: number; // Monthly bonus amount
+  monthlyBonus?: number; // Monthly bonus amount for this specific month's contribution
 }
 
 export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown[] => {
@@ -60,6 +61,7 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     const yearlyContribution = currentMonthlyContribution * 12;
     let yearlyInterest = 0;
     let yearlyExtraProfit = 0;
+    let totalYearlyBonus = 0;
     const monthlyData: MonthlyBreakdown[] = [];
     
     // Calculate month by month for more accurate compounding
@@ -89,6 +91,11 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       // Add the interest and extra profit to the balance
       currentBalance += monthlyInterest + extraProfit;
       
+      // Calculate bonus for this specific month's contribution only
+      const monthlyBonusForThisContribution = currentMonthlyContribution * (yearlyBonusRate / 100);
+      currentBalance += monthlyBonusForThisContribution;
+      totalYearlyBonus += monthlyBonusForThisContribution;
+      
       // Record monthly breakdown
       monthlyData.push({
         month,
@@ -98,27 +105,30 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
         pledgeAmount: pledgeAmount,
         extraProfit: extraProfit,
         endBalance: currentBalance,
-        contributionWithBonus: currentMonthlyContribution
+        contributionWithBonus: currentMonthlyContribution,
+        monthlyBonus: monthlyBonusForThisContribution
       });
     }
     
-    // Apply yearly bonus to ALL previous contributions (including current year)
-    let totalYearlyBonus = 0;
+    // Apply yearly bonus to ALL previous years' contributions (excluding current year which is already added above)
+    let bonusFromPreviousYears = 0;
     
-    // Loop through all years up to and including current year
-    for (let bonusYear = 1; bonusYear <= year; bonusYear++) {
+    // Loop through all previous years (excluding current year)
+    for (let bonusYear = 1; bonusYear < year; bonusYear++) {
       for (let month = 1; month <= 12; month++) {
         const contributionKey = `${bonusYear}-${month}`;
         const contributionAmount = allContributions[contributionKey] || 0;
         const bonusAmount = contributionAmount * (yearlyBonusRate / 100);
-        totalYearlyBonus += bonusAmount;
+        bonusFromPreviousYears += bonusAmount;
         
         // Add bonus to current balance
         currentBalance += bonusAmount;
       }
     }
     
-    // Update the end balance in monthly data for the last month to reflect the total bonus
+    totalYearlyBonus += bonusFromPreviousYears;
+    
+    // Update the end balance in monthly data for the last month to reflect the bonus from previous years
     if (monthlyData.length > 0) {
       monthlyData[monthlyData.length - 1].endBalance = currentBalance;
     }
