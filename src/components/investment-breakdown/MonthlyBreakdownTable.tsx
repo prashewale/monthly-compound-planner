@@ -31,6 +31,7 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
             <TableHead>Regular Interest</TableHead>
             <TableHead>Pledged Amount</TableHead>
             <TableHead>Extra Profit</TableHead>
+            <TableHead>Monthly Bonus</TableHead>
             <TableHead>End Balance</TableHead>
           </TableRow>
         </TableHeader>
@@ -51,13 +52,10 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
                 <TableCell className="font-medium">Year {yearData.year}</TableCell>
                 <TableCell>{formatCurrency(yearData.startBalance)}</TableCell>
                 <TableCell>{formatCurrency(yearData.contributions)}</TableCell>
-                <TableCell colSpan={3}>
-                  {formatCurrency(yearData.interest)}
-                  {yearData.yearlyBonus > 0 && (
-                    <div className="text-xs text-yellow-600 font-medium mt-1">
-                      +{formatCurrency(yearData.yearlyBonus)} bonus
-                    </div>
-                  )}
+                <TableCell>{formatCurrency(yearData.interest)}</TableCell>
+                <TableCell colSpan={2}>-</TableCell>
+                <TableCell className="font-medium text-yellow-600">
+                  {formatCurrency(yearData.yearlyBonus)}
                 </TableCell>
                 <TableCell className="font-medium">{formatCurrency(yearData.endBalance)}</TableCell>
               </TableRow>
@@ -70,6 +68,9 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
                   <TableCell>{formatCurrency(monthData.interest)}</TableCell>
                   <TableCell>{formatCurrency(monthData.pledgeAmount || 0)}</TableCell>
                   <TableCell>{formatCurrency(monthData.extraProfit || 0)}</TableCell>
+                  <TableCell className="text-yellow-600 font-medium">
+                    {formatCurrency(monthData.monthlyBonus || 0)}
+                  </TableCell>
                   <TableCell>{formatCurrency(monthData.endBalance)}</TableCell>
                 </TableRow>
               ))}

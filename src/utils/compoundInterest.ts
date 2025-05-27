@@ -1,4 +1,3 @@
-
 export interface InvestmentData {
   initialInvestment: number;
   monthlyContribution: number;
@@ -30,6 +29,7 @@ export interface MonthlyBreakdown {
   extraProfit: number; // Extra profit from pledging
   endBalance: number;
   contributionWithBonus?: number; // Track the contribution amount that will receive bonus
+  monthlyBonus?: number; // Monthly bonus amount
 }
 
 export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown[] => {
