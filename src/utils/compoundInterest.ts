@@ -1,3 +1,4 @@
+
 export interface InvestmentData {
   initialInvestment: number;
   monthlyContribution: number;
@@ -9,6 +10,9 @@ export interface InvestmentData {
   yearlyContributionIncreaseRate: number; // Yearly percentage increase in contributions
   contributionStopYears: number; // Year when contributions stop
   contributionStopMonths: number; // Additional months when contributions stop
+  monthlyWithdrawalAmount: number; // Monthly withdrawal amount
+  withdrawalStartYears: number; // Year when withdrawals start
+  withdrawalStartMonths: number; // Additional months when withdrawals start
 }
 
 export interface YearlyBreakdown {
@@ -17,6 +21,7 @@ export interface YearlyBreakdown {
   contributions: number;
   interest: number;
   yearlyBonus: number; // Yearly bonus on monthly contributions
+  withdrawals: number; // Total withdrawals for the year
   endBalance: number;
   months?: MonthlyBreakdown[];
   monthlyContribution: number; // Keep track of the monthly contribution for this year
@@ -29,6 +34,7 @@ export interface MonthlyBreakdown {
   interest: number;
   pledgeAmount: number; // Amount pledged after haircut
   extraProfit: number; // Extra profit from pledging
+  withdrawal: number; // Monthly withdrawal amount
   endBalance: number;
   contributionWithBonus?: number; // Track the contribution amount that will receive bonus
   monthlyBonus?: number; // Monthly bonus amount for this specific month's contribution
@@ -45,7 +51,10 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     yearlyBonusRate,
     yearlyContributionIncreaseRate,
     contributionStopYears,
-    contributionStopMonths
+    contributionStopMonths,
+    monthlyWithdrawalAmount,
+    withdrawalStartYears,
+    withdrawalStartMonths
   } = data;
   
   const monthlyRate = annualInterestRate / 100 / 12;
@@ -62,12 +71,16 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
   // Calculate total stop period in months
   const totalStopMonths = (contributionStopYears * 12) + contributionStopMonths;
   
+  // Calculate total withdrawal start period in months
+  const totalWithdrawalStartMonths = (withdrawalStartYears * 12) + withdrawalStartMonths;
+  
   for (let year = 1; year <= years; year++) {
     const startBalance = currentBalance;
     let yearlyContribution = 0;
     let yearlyInterest = 0;
     let yearlyExtraProfit = 0;
     let totalYearlyBonus = 0;
+    let yearlyWithdrawals = 0;
     const monthlyData: MonthlyBreakdown[] = [];
     
     // Calculate total bonus from previous years to distribute monthly
@@ -96,6 +109,10 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       // Check if we should still make contributions
       const shouldMakeContribution = currentMonthFromStart <= totalStopMonths;
       const monthlyContributionAmount = shouldMakeContribution ? currentMonthlyContribution : 0;
+      
+      // Check if we should start withdrawals
+      const shouldMakeWithdrawal = currentMonthFromStart > totalWithdrawalStartMonths;
+      const monthlyWithdrawal = shouldMakeWithdrawal ? monthlyWithdrawalAmount : 0;
       
       // Add this month's contribution
       currentBalance += monthlyContributionAmount;
@@ -130,6 +147,10 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       currentBalance += totalMonthlyBonus;
       totalYearlyBonus += totalMonthlyBonus;
       
+      // Subtract withdrawal amount
+      currentBalance -= monthlyWithdrawal;
+      yearlyWithdrawals += monthlyWithdrawal;
+      
       // Record monthly breakdown
       monthlyData.push({
         month,
@@ -138,6 +159,7 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
         interest: monthlyInterest,
         pledgeAmount: pledgeAmount,
         extraProfit: extraProfit,
+        withdrawal: monthlyWithdrawal,
         endBalance: currentBalance,
         contributionWithBonus: monthlyContributionAmount,
         monthlyBonus: totalMonthlyBonus
@@ -150,6 +172,7 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       contributions: yearlyContribution,
       interest: yearlyInterest + yearlyExtraProfit,
       yearlyBonus: totalYearlyBonus,
+      withdrawals: yearlyWithdrawals,
       endBalance: currentBalance,
       months: monthlyData,
       monthlyContribution: currentMonthlyContribution

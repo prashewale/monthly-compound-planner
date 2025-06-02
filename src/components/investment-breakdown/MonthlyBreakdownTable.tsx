@@ -32,6 +32,7 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
             <TableHead>Pledged Amount</TableHead>
             <TableHead>Extra Profit</TableHead>
             <TableHead>Monthly Bonus</TableHead>
+            <TableHead>Withdrawal</TableHead>
             <TableHead>End Balance</TableHead>
           </TableRow>
         </TableHeader>
@@ -56,6 +57,9 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
               <TableCell className="font-medium text-yellow-600">
                 {formatCurrency(yearData.yearlyBonus)}
               </TableCell>
+              <TableCell className="font-medium text-red-600">
+                {formatCurrency(yearData.withdrawals || 0)}
+              </TableCell>
               <TableCell className="font-medium">{formatCurrency(yearData.endBalance)}</TableCell>
             </TableRow>,
             ...(expandedYears.includes(yearData.year) && yearData.months ? 
@@ -70,6 +74,9 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
                   <TableCell>{formatCurrency(monthData.extraProfit || 0)}</TableCell>
                   <TableCell className="text-yellow-600 font-medium">
                     {formatCurrency(monthData.monthlyBonus || 0)}
+                  </TableCell>
+                  <TableCell className="text-red-600 font-medium">
+                    {formatCurrency(monthData.withdrawal || 0)}
                   </TableCell>
                   <TableCell>{formatCurrency(monthData.endBalance)}</TableCell>
                 </TableRow>

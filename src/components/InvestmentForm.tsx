@@ -23,6 +23,9 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
     yearlyContributionIncreaseRate: 0, // Default 0% yearly increase in contributions
     contributionStopYears: 20, // Default stop at end of investment period
     contributionStopMonths: 0, // Default 0 additional months
+    monthlyWithdrawalAmount: 0, // Default 0 withdrawal
+    withdrawalStartYears: 20, // Default start withdrawals at end of investment period
+    withdrawalStartMonths: 0, // Default 0 additional months
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,6 +165,89 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
               step={1}
               value={[formData.contributionStopMonths]}
               onValueChange={(value) => handleSliderChange("contributionStopMonths", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0 months</span>
+              <span>11 months</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="monthlyWithdrawalAmount">Monthly Withdrawal Amount</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                <IndianRupee className="h-4 w-4" />
+              </span>
+              <Input
+                id="monthlyWithdrawalAmount"
+                name="monthlyWithdrawalAmount"
+                type="number"
+                min="0"
+                step="50"
+                value={formData.monthlyWithdrawalAmount}
+                onChange={handleInputChange}
+                className="flex-1"
+              />
+            </div>
+            <Slider
+              id="monthlyWithdrawalAmount-slider"
+              min={0}
+              max={50000}
+              step={100}
+              value={[formData.monthlyWithdrawalAmount]}
+              onValueChange={(value) => handleSliderChange("monthlyWithdrawalAmount", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span><IndianRupee className="inline h-3 w-3" /> 0</span>
+              <span><IndianRupee className="inline h-3 w-3" /> 50,000</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="withdrawalStartYears">Start Withdrawals After (Years)</Label>
+            <Input
+              id="withdrawalStartYears"
+              name="withdrawalStartYears"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={formData.withdrawalStartYears}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="withdrawalStartYears-slider"
+              min={0}
+              max={60}
+              step={1}
+              value={[formData.withdrawalStartYears]}
+              onValueChange={(value) => handleSliderChange("withdrawalStartYears", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0 years</span>
+              <span>60 years</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="withdrawalStartMonths">Additional Months</Label>
+            <Input
+              id="withdrawalStartMonths"
+              name="withdrawalStartMonths"
+              type="number"
+              min="0"
+              max="11"
+              step="1"
+              value={formData.withdrawalStartMonths}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="withdrawalStartMonths-slider"
+              min={0}
+              max={11}
+              step={1}
+              value={[formData.withdrawalStartMonths]}
+              onValueChange={(value) => handleSliderChange("withdrawalStartMonths", value)}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0 months</span>
