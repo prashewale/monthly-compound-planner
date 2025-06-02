@@ -7,6 +7,8 @@ export interface InvestmentData {
   extraProfitRate: number; // Additional annual profit percentage from pledging
   yearlyBonusRate: number; // Yearly bonus rate for monthly contributions
   yearlyContributionIncreaseRate: number; // Yearly percentage increase in contributions
+  contributionStopYears: number; // Year when contributions stop
+  contributionStopMonths: number; // Additional months when contributions stop
 }
 
 export interface YearlyBreakdown {
@@ -41,7 +43,9 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     pledgeHaircut,
     extraProfitRate,
     yearlyBonusRate,
-    yearlyContributionIncreaseRate
+    yearlyContributionIncreaseRate,
+    contributionStopYears,
+    contributionStopMonths
   } = data;
   
   const monthlyRate = annualInterestRate / 100 / 12;
@@ -55,9 +59,12 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
   // Track current monthly contribution amount
   let currentMonthlyContribution = monthlyContribution;
   
+  // Calculate total stop period in months
+  const totalStopMonths = (contributionStopYears * 12) + contributionStopMonths;
+  
   for (let year = 1; year <= years; year++) {
     const startBalance = currentBalance;
-    const yearlyContribution = currentMonthlyContribution * 12;
+    let yearlyContribution = 0;
     let yearlyInterest = 0;
     let yearlyExtraProfit = 0;
     let totalYearlyBonus = 0;
@@ -83,12 +90,20 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     for (let month = 1; month <= 12; month++) {
       const monthStartBalance = currentBalance;
       
+      // Calculate current month number from start of investment
+      const currentMonthFromStart = ((year - 1) * 12) + month;
+      
+      // Check if we should still make contributions
+      const shouldMakeContribution = currentMonthFromStart <= totalStopMonths;
+      const monthlyContributionAmount = shouldMakeContribution ? currentMonthlyContribution : 0;
+      
       // Add this month's contribution
-      currentBalance += currentMonthlyContribution;
+      currentBalance += monthlyContributionAmount;
+      yearlyContribution += monthlyContributionAmount;
       
       // Track this contribution for yearly bonus (store with year-month key)
       const contributionKey = `${year}-${month}`;
-      allContributions[contributionKey] = currentMonthlyContribution;
+      allContributions[contributionKey] = monthlyContributionAmount;
       
       // Calculate pledging amount (after haircut)
       const pledgeableBalance = currentBalance;
@@ -107,7 +122,7 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       currentBalance += monthlyInterest + extraProfit;
       
       // Calculate bonus for this specific month's contribution
-      const monthlyBonusForThisContribution = currentMonthlyContribution * (yearlyBonusRate / 100);
+      const monthlyBonusForThisContribution = monthlyContributionAmount * (yearlyBonusRate / 100);
       
       // Total monthly bonus = current month's contribution bonus + portion of previous years' bonus
       const totalMonthlyBonus = monthlyBonusForThisContribution + monthlyBonusFromPreviousYears;
@@ -119,12 +134,12 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       monthlyData.push({
         month,
         startBalance: monthStartBalance,
-        contribution: currentMonthlyContribution,
+        contribution: monthlyContributionAmount,
         interest: monthlyInterest,
         pledgeAmount: pledgeAmount,
         extraProfit: extraProfit,
         endBalance: currentBalance,
-        contributionWithBonus: currentMonthlyContribution,
+        contributionWithBonus: monthlyContributionAmount,
         monthlyBonus: totalMonthlyBonus
       });
     }

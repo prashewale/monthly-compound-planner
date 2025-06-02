@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +21,8 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
     extraProfitRate: 3, // Default 3% extra profit
     yearlyBonusRate: 2, // Default 2% yearly bonus on contributions
     yearlyContributionIncreaseRate: 0, // Default 0% yearly increase in contributions
+    contributionStopYears: 20, // Default stop at end of investment period
+    contributionStopMonths: 0, // Default 0 additional months
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,6 +114,58 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <div className="flex justify-between text-xs text-muted-foreground">
               <span><IndianRupee className="inline h-3 w-3" /> 0</span>
               <span><IndianRupee className="inline h-3 w-3" /> 50,000</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contributionStopYears">Stop Contributions After (Years)</Label>
+            <Input
+              id="contributionStopYears"
+              name="contributionStopYears"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={formData.contributionStopYears}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="contributionStopYears-slider"
+              min={0}
+              max={60}
+              step={1}
+              value={[formData.contributionStopYears]}
+              onValueChange={(value) => handleSliderChange("contributionStopYears", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0 years</span>
+              <span>60 years</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contributionStopMonths">Additional Months</Label>
+            <Input
+              id="contributionStopMonths"
+              name="contributionStopMonths"
+              type="number"
+              min="0"
+              max="11"
+              step="1"
+              value={formData.contributionStopMonths}
+              onChange={handleInputChange}
+            />
+            <Slider
+              id="contributionStopMonths-slider"
+              min={0}
+              max={11}
+              step={1}
+              value={[formData.contributionStopMonths]}
+              onValueChange={(value) => handleSliderChange("contributionStopMonths", value)}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>0 months</span>
+              <span>11 months</span>
             </div>
           </div>
 
