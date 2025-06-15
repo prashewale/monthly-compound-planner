@@ -26,6 +26,11 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
     monthlyWithdrawalAmount: 0, // Default 0 withdrawal
     withdrawalStartYears: 20, // Default start withdrawals at end of investment period
     withdrawalStartMonths: 0, // Default 0 additional months
+    // Tax defaults (Indian tax rates)
+    capitalGainsTaxRate: 10, // LTCG tax rate for equity (10%)
+    interestTaxRate: 30, // Tax rate on interest income (30% for highest slab)
+    sttRate: 0.1, // STT rate (0.1%)
+    exemptionLimit: 100000, // Annual LTCG exemption limit (₹1 lakh)
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +58,7 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
       <CardHeader>
         <CardTitle>Investment Parameters</CardTitle>
         <CardDescription>
-          Adjust the values to calculate your investment growth
+          Adjust the values to calculate your investment growth with Indian tax considerations
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -408,6 +413,120 @@ const InvestmentForm = ({ onCalculate }: InvestmentFormProps) => {
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>1 year</span>
               <span>60 years</span>
+            </div>
+          </div>
+
+          {/* Tax Parameters Section */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-medium mb-4">Tax Parameters (Indian Tax Rules)</h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="capitalGainsTaxRate">Long-Term Capital Gains Tax Rate (%)</Label>
+              <Input
+                id="capitalGainsTaxRate"
+                name="capitalGainsTaxRate"
+                type="number"
+                min="0"
+                max="50"
+                step="0.1"
+                value={formData.capitalGainsTaxRate}
+                onChange={handleInputChange}
+              />
+              <Slider
+                id="capitalGainsTaxRate-slider"
+                min={0}
+                max={30}
+                step={0.1}
+                value={[formData.capitalGainsTaxRate]}
+                onValueChange={(value) => handleSliderChange("capitalGainsTaxRate", value)}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>0%</span>
+                <span>30%</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="interestTaxRate">Interest Income Tax Rate (%)</Label>
+              <Input
+                id="interestTaxRate"
+                name="interestTaxRate"
+                type="number"
+                min="0"
+                max="50"
+                step="0.1"
+                value={formData.interestTaxRate}
+                onChange={handleInputChange}
+              />
+              <Slider
+                id="interestTaxRate-slider"
+                min={0}
+                max={40}
+                step={0.1}
+                value={[formData.interestTaxRate]}
+                onValueChange={(value) => handleSliderChange("interestTaxRate", value)}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>0%</span>
+                <span>40%</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sttRate">Securities Transaction Tax Rate (%)</Label>
+              <Input
+                id="sttRate"
+                name="sttRate"
+                type="number"
+                min="0"
+                max="1"
+                step="0.01"
+                value={formData.sttRate}
+                onChange={handleInputChange}
+              />
+              <Slider
+                id="sttRate-slider"
+                min={0}
+                max={0.5}
+                step={0.01}
+                value={[formData.sttRate]}
+                onValueChange={(value) => handleSliderChange("sttRate", value)}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>0%</span>
+                <span>0.5%</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="exemptionLimit">Annual LTCG Exemption Limit</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  <IndianRupee className="h-4 w-4" />
+                </span>
+                <Input
+                  id="exemptionLimit"
+                  name="exemptionLimit"
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={formData.exemptionLimit}
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+              </div>
+              <Slider
+                id="exemptionLimit-slider"
+                min={0}
+                max={200000}
+                step={1000}
+                value={[formData.exemptionLimit]}
+                onValueChange={(value) => handleSliderChange("exemptionLimit", value)}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span><IndianRupee className="inline h-3 w-3" /> 0</span>
+                <span><IndianRupee className="inline h-3 w-3" /> 2,00,000</span>
+              </div>
             </div>
           </div>
 

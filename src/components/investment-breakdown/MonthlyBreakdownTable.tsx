@@ -33,6 +33,9 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
             <TableHead>Extra Profit</TableHead>
             <TableHead>Monthly Bonus</TableHead>
             <TableHead>Withdrawal</TableHead>
+            <TableHead>Tax on Interest</TableHead>
+            <TableHead>Tax on Withdrawal</TableHead>
+            <TableHead>STT</TableHead>
             <TableHead>End Balance</TableHead>
           </TableRow>
         </TableHeader>
@@ -60,6 +63,15 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
               <TableCell className="font-medium text-red-600">
                 {formatCurrency(yearData.withdrawals || 0)}
               </TableCell>
+              <TableCell className="font-medium text-red-600">
+                {formatCurrency(yearData.taxOnInterest || 0)}
+              </TableCell>
+              <TableCell className="font-medium text-red-600">
+                {formatCurrency(yearData.taxOnWithdrawals || 0)}
+              </TableCell>
+              <TableCell className="font-medium text-red-600">
+                {formatCurrency(yearData.sttPaid || 0)}
+              </TableCell>
               <TableCell className="font-medium">{formatCurrency(yearData.endBalance)}</TableCell>
             </TableRow>,
             ...(expandedYears.includes(yearData.year) && yearData.months ? 
@@ -77,6 +89,15 @@ const MonthlyBreakdownTable = ({ breakdown }: MonthlyBreakdownTableProps) => {
                   </TableCell>
                   <TableCell className="text-red-600 font-medium">
                     {formatCurrency(monthData.withdrawal || 0)}
+                  </TableCell>
+                  <TableCell className="text-red-600 font-medium">
+                    {formatCurrency(monthData.taxOnInterest || 0)}
+                  </TableCell>
+                  <TableCell className="text-red-600 font-medium">
+                    {formatCurrency(monthData.taxOnWithdrawal || 0)}
+                  </TableCell>
+                  <TableCell className="text-red-600 font-medium">
+                    {formatCurrency(monthData.stt || 0)}
                   </TableCell>
                   <TableCell>{formatCurrency(monthData.endBalance)}</TableCell>
                 </TableRow>

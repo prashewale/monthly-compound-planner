@@ -19,6 +19,9 @@ const YearlyBreakdownTable = ({ breakdown }: YearlyBreakdownTableProps) => {
             <TableHead>Interest Earned</TableHead>
             <TableHead>Yearly Bonus</TableHead>
             <TableHead>Total Withdrawals</TableHead>
+            <TableHead>Tax on Interest</TableHead>
+            <TableHead>Tax on Withdrawals</TableHead>
+            <TableHead>STT Paid</TableHead>
             <TableHead>End Balance</TableHead>
           </TableRow>
         </TableHeader>
@@ -33,6 +36,15 @@ const YearlyBreakdownTable = ({ breakdown }: YearlyBreakdownTableProps) => {
               <TableCell>{formatCurrency(row.yearlyBonus || 0)}</TableCell>
               <TableCell className="text-red-600">
                 {formatCurrency(row.withdrawals || 0)}
+              </TableCell>
+              <TableCell className="text-red-600">
+                {formatCurrency(row.taxOnInterest || 0)}
+              </TableCell>
+              <TableCell className="text-red-600">
+                {formatCurrency(row.taxOnWithdrawals || 0)}
+              </TableCell>
+              <TableCell className="text-red-600">
+                {formatCurrency(row.sttPaid || 0)}
               </TableCell>
               <TableCell className="font-medium">
                 {formatCurrency(row.endBalance)}

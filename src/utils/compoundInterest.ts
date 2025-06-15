@@ -13,6 +13,11 @@ export interface InvestmentData {
   monthlyWithdrawalAmount: number; // Monthly withdrawal amount
   withdrawalStartYears: number; // Year when withdrawals start
   withdrawalStartMonths: number; // Additional months when withdrawals start
+  // Tax parameters
+  capitalGainsTaxRate: number; // Long-term capital gains tax rate (%)
+  interestTaxRate: number; // Tax rate on interest income (%)
+  sttRate: number; // Securities Transaction Tax rate (%)
+  exemptionLimit: number; // Annual exemption limit for LTCG
 }
 
 export interface YearlyBreakdown {
@@ -22,6 +27,9 @@ export interface YearlyBreakdown {
   interest: number;
   yearlyBonus: number; // Yearly bonus on monthly contributions
   withdrawals: number; // Total withdrawals for the year
+  taxOnInterest: number; // Tax paid on interest income
+  taxOnWithdrawals: number; // Tax paid on withdrawals (LTCG)
+  sttPaid: number; // STT paid during the year
   endBalance: number;
   months?: MonthlyBreakdown[];
   monthlyContribution: number; // Keep track of the monthly contribution for this year
@@ -35,6 +43,9 @@ export interface MonthlyBreakdown {
   pledgeAmount: number; // Amount pledged after haircut
   extraProfit: number; // Extra profit from pledging
   withdrawal: number; // Monthly withdrawal amount
+  taxOnInterest: number; // Monthly tax on interest
+  taxOnWithdrawal: number; // Monthly tax on withdrawal
+  stt: number; // Monthly STT
   endBalance: number;
   contributionWithBonus?: number; // Track the contribution amount that will receive bonus
   monthlyBonus?: number; // Monthly bonus amount for this specific month's contribution
@@ -54,7 +65,11 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     contributionStopMonths,
     monthlyWithdrawalAmount,
     withdrawalStartYears,
-    withdrawalStartMonths
+    withdrawalStartMonths,
+    capitalGainsTaxRate,
+    interestTaxRate,
+    sttRate,
+    exemptionLimit
   } = data;
   
   const monthlyRate = annualInterestRate / 100 / 12;
@@ -74,6 +89,9 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
   // Calculate total withdrawal start period in months
   const totalWithdrawalStartMonths = (withdrawalStartYears * 12) + withdrawalStartMonths;
   
+  // Track cumulative gains for LTCG tax calculation
+  let cumulativeCapitalGains = 0;
+  
   for (let year = 1; year <= years; year++) {
     const startBalance = currentBalance;
     let yearlyContribution = 0;
@@ -81,6 +99,9 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
     let yearlyExtraProfit = 0;
     let totalYearlyBonus = 0;
     let yearlyWithdrawals = 0;
+    let yearlyTaxOnInterest = 0;
+    let yearlyTaxOnWithdrawals = 0;
+    let yearlySTT = 0;
     const monthlyData: MonthlyBreakdown[] = [];
     
     // Calculate total bonus from previous years to distribute monthly
@@ -136,8 +157,13 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       yearlyInterest += monthlyInterest;
       yearlyExtraProfit += extraProfit;
       
-      // Add the interest and extra profit to the balance
-      currentBalance += monthlyInterest + extraProfit;
+      // Calculate tax on interest income (monthly)
+      const totalMonthlyInterest = monthlyInterest + extraProfit;
+      const monthlyTaxOnInterest = totalMonthlyInterest * (interestTaxRate / 100);
+      yearlyTaxOnInterest += monthlyTaxOnInterest;
+      
+      // Add the interest and extra profit to the balance (after tax)
+      currentBalance += totalMonthlyInterest - monthlyTaxOnInterest;
       
       // Calculate bonus for this specific month's contribution
       // Only apply bonus starting from year 2
@@ -149,8 +175,33 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       currentBalance += totalMonthlyBonus;
       totalYearlyBonus += totalMonthlyBonus;
       
-      // Subtract withdrawal amount
-      currentBalance -= monthlyWithdrawal;
+      // Calculate withdrawal tax (LTCG) if withdrawal is made
+      let monthlyTaxOnWithdrawal = 0;
+      let monthlyStt = 0;
+      
+      if (monthlyWithdrawal > 0) {
+        // Calculate capital gains for this withdrawal
+        const totalInvested = initialInvestment + yearlyContribution;
+        const currentGains = Math.max(0, currentBalance - totalInvested);
+        const withdrawalGains = (currentGains / currentBalance) * monthlyWithdrawal;
+        
+        // Add to cumulative gains
+        cumulativeCapitalGains += withdrawalGains;
+        
+        // Calculate LTCG tax (only if gains exceed exemption limit for the year)
+        const taxableGains = Math.max(0, cumulativeCapitalGains - (exemptionLimit / 12)); // Monthly exemption
+        monthlyTaxOnWithdrawal = taxableGains * (capitalGainsTaxRate / 100);
+        
+        // Calculate STT on withdrawal
+        monthlyStt = monthlyWithdrawal * (sttRate / 100);
+        
+        yearlyTaxOnWithdrawals += monthlyTaxOnWithdrawal;
+        yearlySTT += monthlyStt;
+      }
+      
+      // Subtract withdrawal amount and taxes
+      const totalDeduction = monthlyWithdrawal + monthlyTaxOnWithdrawal + monthlyStt;
+      currentBalance -= totalDeduction;
       yearlyWithdrawals += monthlyWithdrawal;
       
       // Record monthly breakdown
@@ -162,6 +213,9 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
         pledgeAmount: pledgeAmount,
         extraProfit: extraProfit,
         withdrawal: monthlyWithdrawal,
+        taxOnInterest: monthlyTaxOnInterest,
+        taxOnWithdrawal: monthlyTaxOnWithdrawal,
+        stt: monthlyStt,
         endBalance: currentBalance,
         contributionWithBonus: monthlyContributionAmount,
         monthlyBonus: totalMonthlyBonus
@@ -175,6 +229,9 @@ export const calculateCompoundInterest = (data: InvestmentData): YearlyBreakdown
       interest: yearlyInterest + yearlyExtraProfit,
       yearlyBonus: totalYearlyBonus,
       withdrawals: yearlyWithdrawals,
+      taxOnInterest: yearlyTaxOnInterest,
+      taxOnWithdrawals: yearlyTaxOnWithdrawals,
+      sttPaid: yearlySTT,
       endBalance: currentBalance,
       months: monthlyData,
       monthlyContribution: currentMonthlyContribution
